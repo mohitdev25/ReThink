@@ -1,0 +1,50 @@
+import 'package:hive/hive.dart';
+
+class RevisionHistory {
+  DateTime reviewDate;
+  int grade; // 0=AGAIN, 1=HARD, 2=GOOD, 3=EASY
+  String cycleNotes;
+  List<String> attachmentIds;
+
+  RevisionHistory({
+    required this.reviewDate,
+    required this.grade,
+    this.cycleNotes = '',
+    this.attachmentIds = const [],
+  });
+}
+
+// MANUAL TYPE ADAPTER (No Code Generation)
+class RevisionHistoryAdapter extends TypeAdapter<RevisionHistory> {
+  @override
+  final int typeId = 1;
+
+  @override
+  RevisionHistory read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    
+    return RevisionHistory(
+      reviewDate: fields[0] as DateTime,
+      grade: fields[1] as int,
+      cycleNotes: fields[2] as String? ?? '',
+      attachmentIds: (fields[3] as List?)?.cast<String>() ?? [],
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, RevisionHistory obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.reviewDate)
+      ..writeByte(1)
+      ..write(obj.grade)
+      ..writeByte(2)
+      ..write(obj.cycleNotes)
+      ..writeByte(3)
+      ..write(obj.attachmentIds);
+  }
+}
